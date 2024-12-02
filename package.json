@@ -43,7 +43,7 @@
         "@types/node": "^22.10.1",
         "@types/vscode": "^1.73.0",
         "@vscode/vsce": "^3.2.1",
-        "pdfjs-dist": "^4.8.69",
+        "pdfjs-dist": "^4.9.124",
         "typescript": "^5.7.2"
     }
 }
