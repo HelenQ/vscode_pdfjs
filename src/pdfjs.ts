@@ -100,16 +100,6 @@ export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
       this.onMessage(document, e)
     );
     webviewPanel.webview.onDidReceiveMessage((e) => {
-      if (e.type === "ready") {
-        vscode.workspace.fs.readFile(document.uri).then(
-          data => {
-            this.postMessage(webviewPanel, "init", {
-              uri: document.uri.path,
-              content: Buffer.from(data).toString('base64')
-            });
-          })
-
-      }
     });
   }
   private getHtmlForWebview(webview: vscode.Webview, data: string): string {
