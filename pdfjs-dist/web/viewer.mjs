@@ -13416,22 +13416,21 @@ const PDFViewerApplication = {
       };
     }
   },
-  async run(config) {
+  async run(config, data) {
     await this.initialize(config);
     const {
       appConfig,
       eventBus
     } = this;
-    let file;
+    // let file;
     // const queryString = document.location.search.substring(1);
     // const params = parseQueryString(queryString);
-    file = document.getElementById("targetFileUrl").getAttribute("data")
-    console.log(file)
-    validateFileURL(file);
+    // file = params.get("file") ?? AppOptions.get("defaultUrl");
+    // validateFileURL(file);
     const fileInput = this._openFileInput = document.createElement("input");
     fileInput.id = "fileInput";
     fileInput.hidden = true;
-    fileInput.type = "file";
+    fileInput.type = "file";	
     fileInput.value = null;
     document.body.append(fileInput);
     fileInput.addEventListener("change", function (evt) {
@@ -13481,9 +13480,9 @@ const PDFViewerApplication = {
     if (this.supportsIntegratedFind) {
       appConfig.findBar?.toggleButton?.classList.add("hidden");
     }
-    if (file) {
+    if (data) {
       this.open({
-        url: file
+        data: data
       });
     } else {
       this._hideViewBookmark();
@@ -14447,19 +14446,17 @@ initCom(PDFViewerApplication);
   PDFPrintServiceFactory.initGlobals(PDFViewerApplication);
 }
 {
-  const HOSTED_VIEWER_ORIGINS = ["vscode-webview", "http://mozilla.github.io", "https://mozilla.github.io"];
+  const HOSTED_VIEWER_ORIGINS = ["null", "http://mozilla.github.io", "https://mozilla.github.io"];
   var validateFileURL = function (file) {
     if (!file) {
       return;
     }
     try {
       const viewerOrigin = new URL(window.location.href).origin || "null";
-      console.log("111111"+viewerOrigin)
       if (HOSTED_VIEWER_ORIGINS.includes(viewerOrigin)) {
         return;
       }
       const fileOrigin = new URL(file, window.location.href).origin;
-      console.log("000000"+viewerOrigin)
       if (fileOrigin !== viewerOrigin) {
         throw new Error("file origin does not match viewer's");
       }
@@ -15296,7 +15293,8 @@ function webViewerLoad() {
     console.error(`webviewerloaded: ${ex}`);
     document.dispatchEvent(event);
   }
-  PDFViewerApplication.run(config);
+  const data = document.getElementById("targetFileUrl").getAttribute("data")
+  PDFViewerApplication.run(config, atob(data));
 }
 document.blockUnblockOnload?.(true);
 if (document.readyState === "interactive" || document.readyState === "complete") {

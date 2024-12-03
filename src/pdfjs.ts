@@ -93,7 +93,8 @@ export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
         webviewPanel.webview.options = {
             enableScripts: true,
         };
-        webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document.uri.toString());
+        const result = new Uint8Array(await vscode.workspace.fs.readFile(document.uri)).buffer;
+        webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, Buffer.from(result).toString("base64"));
 
         webviewPanel.webview.onDidReceiveMessage((e) =>
             this.onMessage(document, e)
@@ -111,7 +112,7 @@ export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
             }
         });
     }
-    private getHtmlForWebview(webview: vscode.Webview, uri: string): string {
+    private getHtmlForWebview(webview: vscode.Webview, data: string): string {
         // Local path to script and css for the webview
         const pdfjsWorkDir = webview.asWebviewUri(
             vscode.Uri.joinPath(this._context.extensionUri, "pdfjs-dist")
@@ -157,7 +158,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
   <body tabindex="0">
     <div id="outerContainer">
-      <div id="targetFileUrl" data="${uri}"/>
+      <div id="targetFileUrl" data="${data}"/>
       <div id="sidebarContainer">
         <div id="toolbarSidebar" class="toolbarHorizontalGroup">
           <div id="toolbarSidebarLeft">
