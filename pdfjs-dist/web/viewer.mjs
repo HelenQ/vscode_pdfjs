@@ -13482,7 +13482,8 @@ const PDFViewerApplication = {
     }
     if (data) {
       this.open({
-        data: data
+        data: data,
+        cMapUrl: config.cMapUrl
       });
     } else {
       this._hideViewBookmark();
@@ -15294,6 +15295,9 @@ function webViewerLoad() {
     document.dispatchEvent(event);
   }
   const data = document.getElementById("targetFileUrl").getAttribute("data")
+  const workPath = document.getElementById("targetFileUrl").getAttribute("workPath")
+  config.cMapUrl = workPath + "/web/cmaps/"
+  console.log(config.cMapUrl)
   PDFViewerApplication.run(config, atob(data));
 }
 document.blockUnblockOnload?.(true);

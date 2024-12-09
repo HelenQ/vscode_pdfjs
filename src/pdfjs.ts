@@ -148,7 +148,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
   <body tabindex="0">
     <div id="outerContainer">
-      <div id="targetFileUrl" data="${data}"/>
+      <div id="targetFileUrl" data="${data}" workPath="${pdfjsWorkDir}"/>
       <div id="sidebarContainer">
         <div id="toolbarSidebar" class="toolbarHorizontalGroup">
           <div id="toolbarSidebarLeft">
