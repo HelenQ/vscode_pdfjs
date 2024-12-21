@@ -13416,7 +13416,7 @@ const PDFViewerApplication = {
       };
     }
   },
-  async run(config, data) {
+  async run(config, data, url) {
     await this.initialize(config);
     const {
       appConfig,
@@ -13482,6 +13482,7 @@ const PDFViewerApplication = {
     }
     if (data) {
       this.open({
+        url: url,
         data: data,
         cMapUrl: config.cMapUrl
       });
@@ -15295,10 +15296,11 @@ function webViewerLoad() {
     document.dispatchEvent(event);
   }
   const data = document.getElementById("targetFileUrl").getAttribute("data")
+  const url = document.getElementById("targetFileUrl").getAttribute("url")
   const workPath = document.getElementById("targetFileUrl").getAttribute("workPath")
   config.cMapUrl = workPath + "/web/cmaps/"
   console.log(config.cMapUrl)
-  PDFViewerApplication.run(config, atob(data));
+  PDFViewerApplication.run(config, atob(data), url);
 }
 document.blockUnblockOnload?.(true);
 if (document.readyState === "interactive" || document.readyState === "complete") {

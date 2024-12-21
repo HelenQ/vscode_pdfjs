@@ -94,7 +94,7 @@ export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
       enableScripts: true,
     };
     const result = new Uint8Array(await vscode.workspace.fs.readFile(document.uri)).buffer;
-    webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, Buffer.from(result).toString("base64"));
+    webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, Buffer.from(result).toString("base64"), document.uri.fsPath);
 
     webviewPanel.webview.onDidReceiveMessage((e) =>
       this.onMessage(document, e)
@@ -102,7 +102,7 @@ export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
     webviewPanel.webview.onDidReceiveMessage((e) => {
     });
   }
-  private getHtmlForWebview(webview: vscode.Webview, data: string): string {
+  private getHtmlForWebview(webview: vscode.Webview, data: string, url: string): string {
     // Local path to script and css for the webview
     const pdfjsWorkDir = webview.asWebviewUri(
       vscode.Uri.joinPath(this._context.extensionUri, "pdfjs-dist")
@@ -148,7 +148,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
   <body tabindex="0">
     <div id="outerContainer">
-      <div id="targetFileUrl" data="${data}" workPath="${pdfjsWorkDir}"/>
+      <div id="targetFileUrl" data="${data}" url="${url}" workPath="${pdfjsWorkDir}"/>
       <div id="sidebarContainer">
         <div id="toolbarSidebar" class="toolbarHorizontalGroup">
           <div id="toolbarSidebarLeft">
