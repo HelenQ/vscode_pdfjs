@@ -7623,7 +7623,7 @@ class PDFPrintServiceFactory {
     viewerApp = app;
   }
   static get supportsPrinting() {
-    return shadow(this, "supportsPrinting", true);
+    return shadow(this, "supportsPrinting", false);
   }
   static createPrintService(params) {
     if (activeService) {
