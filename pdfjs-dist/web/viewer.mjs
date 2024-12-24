@@ -20,6 +20,8 @@
  * JavaScript code in this page
  */
 
+import { Base64 } from "../../node_modules/js-base64/base64.mjs";
+
 /******/ // The require scope
 /******/ var __webpack_require__ = {};
 /******/ 
@@ -4311,27 +4313,18 @@ class CaretBrowsingMode {
 
 ;// ./web/download_manager.js
 
-function download(blobUrl, filename) {
-  const a = document.createElement("a");
-  if (!a.click) {
-    throw new Error('DownloadManager: "a.click()" is not supported.');
-  }
-  a.href = blobUrl;
-  a.target = "_parent";
-  if ("download" in a) {
-    a.download = filename;
-  }
-  (document.body || document.documentElement).append(a);
-  a.click();
-  a.remove();
+function download(content, filename) {
+  vscode.postMessage(
+    {
+      type: "save",
+      data: Base64.fromUint8Array(content),
+    }
+  )
 }
 class DownloadManager {
   #openBlobUrls = new WeakMap();
   downloadData(data, filename, contentType) {
-    const blobUrl = URL.createObjectURL(new Blob([data], {
-      type: contentType
-    }));
-    download(blobUrl, filename);
+    download(data, filename);
   }
   openOrDownloadData(data, filename, dest = null) {
     const isPdfData = isPdfFile(filename);
@@ -4362,19 +4355,7 @@ class DownloadManager {
     return false;
   }
   download(data, url, filename) {
-    let blobUrl;
-    if (data) {
-      blobUrl = URL.createObjectURL(new Blob([data], {
-        type: "application/pdf"
-      }));
-    } else {
-      if (!createValidAbsoluteUrl(url, "http://example.com")) {
-        console.error(`download - not a valid URL: ${url}`);
-        return;
-      }
-      blobUrl = url + "#pdfjs.action=download";
-    }
-    download(blobUrl, filename);
+    download(data, filename);
   }
 }
 
@@ -13480,6 +13461,8 @@ const PDFViewerApplication = {
     if (this.supportsIntegratedFind) {
       appConfig.findBar?.toggleButton?.classList.add("hidden");
     }
+    appConfig.toolbar?.download.classList.add("hidden");
+    appConfig.secondaryToolbar?.openFileButton.classList.add("hidden");
     if (data) {
       this.open({
         url: url,
@@ -15113,6 +15096,7 @@ function beforeUnload(evt) {
 
 const pdfjsVersion = "4.9.124";
 const pdfjsBuild = "867aaf01f";
+const vscode = acquireVsCodeApi();
 const AppConstants = {
   LinkTarget: LinkTarget,
   RenderingStates: RenderingStates,
@@ -15301,6 +15285,13 @@ function webViewerLoad() {
   config.cMapUrl = workPath + "/web/cmaps/"
   console.log(config.cMapUrl)
   PDFViewerApplication.run(config, atob(data), url);
+  window.addEventListener("message", event => {
+    const message = event.data
+    switch (message.type) {
+      case 'save':
+        this.save()
+    }
+  });
 }
 document.blockUnblockOnload?.(true);
 if (document.readyState === "interactive" || document.readyState === "complete") {

@@ -36,6 +36,14 @@ class WebviewCollection {
       this._webviews.delete(entry);
     });
   }
+  async save(uri: vscode.Uri) {
+    const key = uri.toString();
+    for (const entry of this._webviews) {
+      if (entry.resource === key) {
+        entry.webviewPanel.webview.postMessage({ "type": "save" })
+      }
+    }
+  }
 }
 
 export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
@@ -74,6 +82,8 @@ export class PdfProvider implements vscode.CustomEditorProvider<PdfDocument> {
       case "openPdfError":
         vscode.window.showErrorMessage("打开PDF文件错误：" + message.error);
         return;
+      case "save":
+        vscode.workspace.fs.writeFile(document.uri, Buffer.from(message.data, "base64"))
     }
   }
 
@@ -370,7 +380,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                   </div>
                 </div>
 
-                <div id="editorModeSeparator" class="verticalToolbarSeparator"></div>
+                <div id="editorModeSeparator" class="verticalToolbarSeparator hidden"></div>
 
                 <div class="toolbarHorizontalGroup hiddenMediumView">
                   <button id="printButton" class="toolbarButton" type="button" title="Print" tabindex="0" data-l10n-id="pdfjs-print-button">
@@ -382,7 +392,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                   </button>
                 </div>
 
-                <div class="verticalToolbarSeparator hiddenMediumView"></div>
+                <div class="verticalToolbarSeparator hiddenMediumView hidden"></div>
 
                 <div id="secondaryToolbarToggle" class="toolbarButtonWithContainer">
                   <button id="secondaryToolbarToggleButton" class="toolbarButton" type="button" title="Tools" tabindex="0" data-l10n-id="pdfjs-tools-button" aria-expanded="false" aria-haspopup="true" aria-controls="secondaryToolbar">
@@ -405,7 +415,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
                       </div>
 
-                      <div class="horizontalToolbarSeparator"></div>
+                      <div class="horizontalToolbarSeparator hidden"></div>
 
                       <button id="presentationMode" class="toolbarButton labeled" type="button" title="Switch to Presentation Mode" tabindex="0" data-l10n-id="pdfjs-presentation-mode-button">
                         <span data-l10n-id="pdfjs-presentation-mode-button-label">Presentation Mode</span>
@@ -735,7 +745,7 @@ See https://github.com/adobe-type-tools/cmap-resources
   }
 
   saveCustomDocument(document: PdfDocument, cancellation: vscode.CancellationToken): Thenable<void> {
-    throw new Error('Method not implemented.');
+    return this.webviews.save(document.uri)
   }
   saveCustomDocumentAs(document: PdfDocument, destination: vscode.Uri, cancellation: vscode.CancellationToken): Thenable<void> {
     throw new Error('Method not implemented.');
