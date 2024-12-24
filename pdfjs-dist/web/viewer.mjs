@@ -15289,7 +15289,7 @@ function webViewerLoad() {
     const message = event.data
     switch (message.type) {
       case 'save':
-        this.save()
+        PDFViewerApplication.save()
     }
   });
 }
