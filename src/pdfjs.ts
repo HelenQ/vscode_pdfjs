@@ -156,7 +156,7 @@ See https://github.com/adobe-type-tools/cmap-resources
   <script src="${pdfjsWorkDir}/web/viewer.mjs" type="module"></script>
   </head>
 
-  <body tabindex="0">
+  <body tabindex="0" style="padding: 0 0px;">
     <div id="outerContainer">
       <div id="targetFileUrl" data="${data}" url="${url}" workPath="${pdfjsWorkDir}"/>
       <div id="sidebarContainer">
